@@ -21,7 +21,7 @@ copy_endtime = time.time() +3600 * (args.time)
 
 
 while time.time() < copy_endtime:
-	os.system("rsync -hurvza --progress --remove-source-files `find {cwd} -type f -name {ext:s} -mmin +5` adrian@10.119.49.163:/media/file_server/Polara_Data/".format(cwd=cwd, ext=ext))
+	os.system("rsync -hurvza --progress --remove-source-files `find {cwd} -type f -name '{ext:s}' -mmin +5` adrian@10.119.49.163:/media/file_server/Polara_Data/".format(cwd=cwd, ext=ext))
 	time.sleep(60)
 print "\nPolara data transfer completed"
 
