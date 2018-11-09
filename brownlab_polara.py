@@ -1,5 +1,9 @@
 #!/usr/bin/env python2.7
 
+# TODO
+# - add optional args to allow input and output directory specification
+# - add short arg options (e.g. "-t, --time" produce the same result)
+
 import os
 import sys
 import time
