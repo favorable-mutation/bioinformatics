@@ -1,0 +1,65 @@
+#!/usr/bin/env python2.7
+
+# import modules for interacting with the operating system
+import os
+import sys
+import time
+import datetime
+
+# import module for creating functions with option to pass them arguments
+import argparse
+
+# initialize a parser object that can process arguments
+parser = argparse.ArgumentParser(
+        description=
+        "This script runs an 'rsync' command to transfer all files in the current directory specified by the given extension to the given output directory.\
+        It should be run from the directory containing the files to be copied, unless an input directory is specified.\
+        The 'rsync' command will copy all files created during the specified time interval to the specified output directory,\
+        remove the local copy of the files, then stop.")
+
+# add an argument 'time' for the user to specify the time in hours until
+# all data has been collected and the transfer can stop
+parser.add_argument("-t", "--time", type=int, required=True,
+     help="Expected runtime of data collection in hours. Required.")
+
+# add an argument 'input_dir' for specifying the input directory for the transfer
+parser.add_argument("-i", "--input_dir", type=str, default=os.getcwd(),
+     help="Input directory for the data transfer. Defaults to the current directory.")
+
+# add an argument 'output_dir' for specifying the output directory for the transfer
+parser.add_argument("-o", "--output_dir", type=str, required=True,
+     help="Destination/output directory for the data transfer. Required.")
+
+# add an argument 'extension' for specifying the input directory for the transfer
+parser.add_argument("-e", "--extension", type=str, default="*.tif",
+     help="File extension for the data transfer. Defaults to '*.tif'.")
+
+# add an argument 'host' for specifying the ssh host for the transfer
+parser.add_argument("-s", "--host", type=str, default="adrian@10.119.49.163",
+     help="Destination SSH Host for the data transfer. Defaults to 'adrian@10.119.49.163'.")
+
+# initialize the variable 'cwd' as the current working directory of the shell
+cwd = os.getcwd()
+
+# initialize the variable 'args' as the list of arguments for the parser
+args = parser.parse_args()
+
+# initialize the variables 'ext', 'out', and 'host' as various arguments from the parser
+ext = args.extension
+out = args.output_dir
+host = args.host
+
+# initialize the variable 'copy_endtime' as the current time plus 3600 seconds for every expected hour of data collection
+copy_endtime = time.time() + 3600 * (args.time)
+
+# while the current time is less than the 'copy_endtime' variable
+while time.time() < copy_endtime:
+
+    # run an rsync operation using the parameters given in 'args' to transfer all files of the given 'extension' in the given 'input_directory' to the given 'output-directory' at the given 'host' for the given 'time'
+    os.system("rsync -hurvza --progress --remove-source-files `find '{cwd}' -type f -name '{ext:s}' -mmin +5` {host}:{out}".format(cwd=cwd, ext=ext, out=out, host=host))
+
+    # wait for 60 seconds before exiting
+    time.sleep(60)
+
+# print a confirmation message when script has finished running
+print "\nData transfer completed."
