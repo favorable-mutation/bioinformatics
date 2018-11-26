@@ -1,5 +1,7 @@
 #!/usr/bin/env python2.7
 
+# TODO port this script to python 3
+
 # import modules for interacting with the operating system
 import os
 import sys
