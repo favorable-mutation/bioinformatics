@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+
+# ---------------------------------------------------------------
+# This script is for use in analyzing protein sequences. It takes
+# any number of FASTA-formatted amino acid sequences, a number,
+# and a specific amino acid, and returns all peptides with
+# the given number of residues that begin with the given
+# amino acid within all given sequences.
+
+# The script defaults to M (methionine) for the amino acid,
+# and 20 for the number of residues. When counting residues,
+# the script counts the given amino acid.
+# --------------------------------------------------------------
+
+# import the 'argparse' module to allow passing commandline arguments
+# to the script
+import argparse
+
+# initialize the variable 'parser' as a new argument parser generated
+# by the 'ArgumentParser' method of the 'argparse' module
+parser = argparse.ArgumentParser(description='This script is for use \
+        in analyzing protein sequences. It takes any number of FASTA-formatted \
+        amino acid sequences, a number, and a specific amino acid, and returns \
+        all peptides with the given number of residues that begin with the given \
+        amino acid within all given sequences. \
+        The script defaults to M (methionine) for the amino acid, \
+        and 20 for the number of residues. When counting residues, \
+        the script counts the given amino acid.')
+
+# add an argument 'sequence' to the 'parser' object representing a list of
+# files containing FASTA-formatted sequences
+parser.add_argument('sequence', type=argparse.FileType('r'),
+        help='One or more plaintext files containing one or more \
+                FASTA-formatted protein sequences.')
+
+# add an argument 'amino_acid' to the 'parser' object representing a
+# non-empty list of single letter amino acid encodings
+parser.add_argument('-a', '--amino_acid', default='M',
+        help='A single letter corresponding to an amino acid (e.g. \
+                A for arginine). Defaults to M (methionine). Can be \
+                used to indicate a sequence of amino acids instead if used with \
+                the --long argument.')
+
+# add an argument 'residues' to the 'parser' object representing the
+# length of the peptide(s) to return
+parser.add_argument('-r', '--residues', type=int, default=1,
+        help='An integer signifying the desired peptide length. \
+                Defaults to 1.')
+
+# add an argument 'long' to the 'parser' object indicating whether
+# the 'amino_acid' argument can be a list longer than one item
+parser.add_argument('-l', '--long', action='store_true', default=False,
+        help='A boolean value specifying whether the initial amino \
+                acid supplied by the --amino_acid argument is treated as a single \
+                amino acid or a longer sequence of amino acids. Defaults to false.')
+
+# assign the variable 'args' to the result of calling the 'parse_args'
+# method of the 'parser' object
+args = parser.parse_args()
+
+# TODO
+# return all peptides with the number of residues given by the 'residues'
+# argument that begin with the amino acid given by the 'amino_acid' argument
+# that can be found within the sequences given by the 'sequence' argument
+print(f"""
+DEBUG
+-----
+sequence: {args.sequence}
+--amino_acid: {args.amino_acid}
+--residues: {args.residues}
+--long: {args.long}
+""")
