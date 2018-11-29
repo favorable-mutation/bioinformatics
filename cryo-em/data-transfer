@@ -1,5 +1,18 @@
 #!/usr/bin/env python2.7
 
+# ---------------------------------------------------------------
+# This script runs an 'rsync' command to transfer all files in
+# the current directory specified by the given extension to the
+# given output directory.
+#
+# It should be run from the directory containing the files to be
+# copied, unless an input directory is specified.
+#
+# The 'rsync' command will copy all files created during the 
+# specified time interval to the specified output directory,
+# remove the local copy of the files, then stop.
+# ---------------------------------------------------------------
+
 # TODO port this script to python 3
 
 # import modules for interacting with the operating system
@@ -15,30 +28,30 @@ import argparse
 parser = argparse.ArgumentParser(
         description=
         "This script runs an 'rsync' command to transfer all files in the current directory specified by the given extension to the given output directory.\
-        It should be run from the directory containing the files to be copied, unless an input directory is specified.\
-        The 'rsync' command will copy all files created during the specified time interval to the specified output directory,\
-        remove the local copy of the files, then stop.")
+                It should be run from the directory containing the files to be copied, unless an input directory is specified.\
+                The 'rsync' command will copy all files created during the specified time interval to the specified output directory,\
+                remove the local copy of the files, then stop.")
 
 # add an argument 'time' for the user to specify the time in hours until
 # all data has been collected and the transfer can stop
 parser.add_argument("-t", "--time", type=int, required=True,
-     help="Expected runtime of data collection in hours. Required.")
+        help="Expected runtime of data collection in hours. Required.")
 
 # add an argument 'input_dir' for specifying the input directory for the transfer
 parser.add_argument("-i", "--input_dir", type=str, default=os.getcwd(),
-     help="Input directory for the data transfer. Defaults to the current directory.")
+        help="Input directory for the data transfer. Defaults to the current directory.")
 
 # add an argument 'output_dir' for specifying the output directory for the transfer
 parser.add_argument("-o", "--output_dir", type=str, required=True,
-     help="Destination/output directory for the data transfer. Required. Use of absolute paths is recommended.")
+        help="Destination/output directory for the data transfer. Required. Use of absolute paths is recommended.")
 
 # add an argument 'extension' for specifying the input directory for the transfer
 parser.add_argument("-e", "--extension", type=str, default="tif",
-     help="File extension for the data transfer. Defaults to 'tif'. Specify the extension only (no dot.)")
+        help="File extension for the data transfer. Defaults to 'tif'. Specify the extension only (no dot.)")
 
 # add an argument 'host' for specifying the ssh host for the transfer
 parser.add_argument("-s", "--host", type=str, default="adrian@10.119.49.163",
-     help="Destination SSH Host for the data transfer. Defaults to 'adrian@10.119.49.163'.")
+        help="Destination SSH Host for the data transfer. Defaults to 'adrian@10.119.49.163'.")
 
 # initialize the variable 'cwd' as the current working directory of the shell
 cwd = os.getcwd()
