@@ -29,7 +29,7 @@ parser = argparse.ArgumentParser(description='This script is for use \
 
 # add an argument 'sequence' to the 'parser' object representing a list of
 # files containing FASTA-formatted sequences
-parser.add_argument('sequence', type=argparse.FileType('r'),
+parser.add_argument('sequence', type=argparse.FileType('r'), nargs='+',
         help='One or more plaintext files containing one or more \
                 FASTA-formatted protein sequences.')
 
@@ -57,6 +57,9 @@ parser.add_argument('-l', '--long', action='store_true', default=False,
 # assign the variable 'args' to the result of calling the 'parse_args'
 # method of the 'parser' object
 args = parser.parse_args()
+
+# read the contents of the input file into a variable 'FASTA'
+FASTA = args.sequence.read()
 
 # TODO
 # return all peptides with the number of residues given by the 'residues'
