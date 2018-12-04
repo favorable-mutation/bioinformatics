@@ -28,7 +28,8 @@ parser = argparse.ArgumentParser(description='This script is for use \
         the script counts the given amino acid.')
 
 # add an argument 'sequence' to the 'parser' object representing a list of
-# files containing FASTA-formatted sequences
+# files containing FASTA-formatted sequences; python will automatically run the
+# open() method on the given files
 parser.add_argument('sequence', type=argparse.FileType('r'), nargs='+',
         help='One or more plaintext files containing one or more \
                 FASTA-formatted protein sequences.')
@@ -47,29 +48,39 @@ parser.add_argument('-r', '--residues', type=int, default=1,
         help='An integer signifying the desired peptide length. \
                 Defaults to 1.')
 
-# add an argument 'long' to the 'parser' object indicating whether
-# the 'amino_acid' argument can be a list longer than one item
-parser.add_argument('-l', '--long', action='store_true', default=False,
-        help='A boolean value specifying whether the initial amino \
-                acid supplied by the --amino_acid argument is treated as a single \
-                amino acid or a longer sequence of amino acids. Defaults to false.')
-
 # assign the variable 'args' to the result of calling the 'parse_args'
 # method of the 'parser' object
 args = parser.parse_args()
 
-# read the contents of the input file into a variable 'FASTA'
-FASTA = args.sequence.read()
+# TODO
+# define a function to find subsequences in all given sequences that fit the
+# given requirements
+def processFASTA(LOF, acid, length):
+    for inputfile in LOF:
+        seq = ""
+        for line in inputfile:
+            if line.startswith(">") and seq == "":
+                seqname = line.replace("\n", "")
+            elif line.startswith(">"):
+                searchSeq(seq, seqname, acid, length)
+                seq = ""
+                seqname = line.replace("\n", "")
+            else:
+                seq += line.replace("\n", "")
+        searchSeq(seq, seqname, acid, length)
 
 # TODO
+# define a function to search a string representing a sequence of amino acids
+# for a given amino acid
+def searchSeq(sequence, name, acid, length):
+    place = 0
+    for i in range(sequence.count(acid)):
+        start = sequence.find(acid, place)
+        subseq = sequence[start:(start + length)]
+        print("\n" + name + f"|{i + 1}" + "\n" + subseq)
+        place = start + 1
+
 # return all peptides with the number of residues given by the 'residues'
 # argument that begin with the amino acid given by the 'amino_acid' argument
 # that can be found within the sequences given by the 'sequence' argument
-print(f"""
-DEBUG
------
-sequence: {args.sequence}
---amino_acid: {args.amino_acid}
---residues: {args.residues}
---long: {args.long}
-""")
+processFASTA(args.sequence, args.amino_acid, args.residues)

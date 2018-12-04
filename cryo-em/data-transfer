@@ -46,8 +46,10 @@ parser.add_argument("-i", "--input_dir", type=str, default=os.getcwd(),
         help="Input directory for the data transfer. Defaults to the current directory.")
 
 # add an argument 'extension' for specifying the input directory for the transfer
-parser.add_argument("-e", "--extension", type=str, default="tif",
-        help="File extension for the data transfer. Defaults to 'tif'. Specify the extension only (no dot.)")
+parser.add_argument("-e", "--extension", type=str, default="",
+        help="File extension for the data transfer. Defaults to '', which \
+        targets all files. Specify an extension (including the dot, as in \
+        .txt) to change this behavior.")
 
 # add an argument 'host' for specifying the ssh host for the transfer
 parser.add_argument("-s", "--host", type=str, default="adrian@10.119.49.163",
@@ -70,7 +72,7 @@ while time.time() < copy_endtime:
 
     # run an rsync operation using the parameters given in 'args' to transfer all files of the given 'extension' in the given 'input_directory' to the given 'output-directory' at the given 'host' for the given 'time'
     os.system("rsync -hurvza --progress --remove-source-files `find '{inp}' \
-            -type f -name '*.{ext:s}' -mmin +5` {host}:{out}".format(inp=inp, ext=ext, out=out, host=host))
+            -type f -name '*{ext:s}' -mmin +5` {host}:{out}".format(inp=inp, ext=ext, out=out, host=host))
 
     # wait for 60 seconds before exiting
     time.sleep(60)
