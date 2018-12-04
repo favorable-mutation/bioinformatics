@@ -56,28 +56,31 @@ args = parser.parse_args()
 # define a function to find subsequences in all given sequences that fit the
 # given requirements
 def processFASTA(LOF, acid, length):
+    sep = ""
     for inputfile in LOF:
         seq = ""
         for line in inputfile:
             if line.startswith(">") and seq == "":
                 seqname = line.replace("\n", "")
             elif line.startswith(">"):
-                searchSeq(seq, seqname, acid, length)
+                searchSeq(seq, seqname, acid, length, sep)
                 seq = ""
+                sep = "\n"
                 seqname = line.replace("\n", "")
             else:
                 seq += line.replace("\n", "")
-        searchSeq(seq, seqname, acid, length)
+        searchSeq(seq, seqname, acid, length, sep)
 
 # TODO
 # define a function to search a string representing a sequence of amino acids
 # for a given amino acid
-def searchSeq(sequence, name, acid, length):
+def searchSeq(sequence, name, acid, length, sep):
     place = 0
     for i in range(sequence.count(acid)):
         start = sequence.find(acid, place)
         subseq = sequence[start:(start + length)]
-        print("\n" + name + f"|{i + 1}" + "\n" + subseq)
+        trunc = name[:name.find("|")]
+        print(sep + trunc + f"_{i + 1}" + "\n" + subseq)
         place = start + 1
 
 # return all peptides with the number of residues given by the 'residues'
