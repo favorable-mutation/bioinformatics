@@ -25,7 +25,9 @@ parser = argparse.ArgumentParser(description='This script is for use \
         amino acid within all given sequences. \
         The script defaults to M (methionine) for the amino acid, \
         and 20 for the number of residues. When counting residues, \
-        the script counts the given amino acid.')
+        the script counts the given amino acid. The script will not \
+        return peptides shorter than half of the given number of \
+        residues.')
 
 # add an argument 'sequence' to the 'parser' object representing a list of
 # files containing FASTA-formatted sequences; python will automatically run the
@@ -39,49 +41,156 @@ parser.add_argument('sequence', type=argparse.FileType('r'), nargs='+',
 parser.add_argument('-a', '--amino_acid', default='M',
         help='A single letter corresponding to an amino acid (e.g. \
                 A for arginine). Defaults to M (methionine). Can be \
-                used to indicate a sequence of amino acids instead if used with \
-                the --long argument.')
+                used to indicate a sequence of amino acids instead if more \
+                than one is specified.')
 
 # add an argument 'residues' to the 'parser' object representing the
 # length of the peptide(s) to return
 parser.add_argument('-r', '--residues', type=int, default=1,
         help='An integer signifying the desired peptide length. \
-                Defaults to 1.')
+                Defaults to 1. Can be negative.')
 
 # assign the variable 'args' to the result of calling the 'parse_args'
 # method of the 'parser' object
 args = parser.parse_args()
 
-# TODO
+# --------------------------------------------------------------------------- #
+
 # define a function to find subsequences in all given sequences that fit the
 # given requirements
 def processFASTA(LOF, acid, length):
+
+    # assign the variable sep to the empty string
     sep = ""
+
+    # iterate over the given list of files (file-by-file)
     for inputfile in LOF:
+
+        # assign the variable seq to the empty string
         seq = ""
+
+        # iterate over a single file in the given list of files (line-by-line)
         for line in inputfile:
+
+            # if the given line starts with >, denoting the name of a FASTA
+            # sequence, and seq is currently equivalent to the
+            # empty string
             if line.startswith(">") and seq == "":
-                seqname = line.replace("\n", "")
+
+                # assign the variable seqname to the result of calling
+                # formatSeqName on the line
+                seqname = formatSeqName(line)
+
+            # or else if the line denotes a FASTA sequence name but seq isn't an
+            # empty string
             elif line.startswith(">"):
+
+                # call searchSeq on the current value of seq, and also pass it
+                # the current seqname, the given acid and length, and the
+                # current value of sep
                 searchSeq(seq, seqname, acid, length, sep)
+
+                # assign the variable seq to the empty string
                 seq = ""
+
+                # assign the variable sep to a newline character
                 sep = "\n"
-                seqname = line.replace("\n", "")
+
+                # assign the variable seqname to the result of calling
+                # formatSeqName on the line
+                seqname = formatSeqName(line)
+
+            # or else if the line isn't the name of a FASTA sequence
             else:
+
+                # remove any newline characters in the line and append the line
+                # to the current value of seq
                 seq += line.replace("\n", "")
+
+        # after iterating over every line in the file, call searchSeq one more
+        # time on the current values of seq, seqname, and sep, also passing it
+        # the given acid and length
         searchSeq(seq, seqname, acid, length, sep)
 
-# TODO
+# --------------------------------------------------------------------------- #
+
+# define a function to format a string as a sequence name by removing all info
+# after the first pipe and any linebreaks
+def formatSeqName(string):
+
+    # remove any newline characters from the given string
+    string = string.replace("\n", "")
+
+    # if a pipe character is found in the string (that isn't the first
+    # character)
+    if string.find("|") > 0:
+
+        # reassign the string to everything to the left of the pipe
+        string = string[:string.find("|")]
+
+    # and return the string
+    return string
+
+# --------------------------------------------------------------------------- #
+
+# TODO implement a way to return peptides starting before the given amino acid
 # define a function to search a string representing a sequence of amino acids
 # for a given amino acid
-def searchSeq(sequence, name, acid, length, sep):
+def searchSeq(seq, seqname, acid, length, sep):
+
+    # assign the variable place to 0
     place = 0
-    for i in range(sequence.count(acid)):
-        start = sequence.find(acid, place)
-        subseq = sequence[start:(start + length)]
-        trunc = name[:name.find("|")]
-        print(sep + trunc + f"_{i + 1}" + "\n" + subseq)
+
+    # iterate over every i between 0 and the total number of times the given
+    # acid is found in the given seq, increasing i by 1 each time
+    for i in range(seq.count(acid)):
+
+        # assign the variable trunc to the given seqname with the current value
+        # of i + 1 appended to the end of it
+        trunc = seqname + f"_{i + 1}"
+
+        # assign the variable start to the first occurrence of the given acid in
+        # the given seq, beginning the search from the position specified by the
+        # current value of place
+        start = seq.find(acid, place)
+
+        # assign the variable subseq to the substring of the given seq from the
+        # current value of start to the current value of start to the given
+        # length, indexed from 0
+        subseq = seq[start:(start + length)]
+
+        # if the length of the current value of subseq is greater than or equal
+        # to half the given length
+        if len(subseq) >= length / 2:
+
+            # print the concatenation of the given sep, the current value of
+            # trunc, a newline character, and the current value of subseq
+            print(sep + trunc + "\n" + subseq)
+
+        # assign the variable place to the current value of start + 1
         place = start + 1
+
+        # assign the variable sep to a newline character
+        sep = "\n"
+
+# --------------------------------------------------------------------------- #
+
+# define a function to return the given number or 0, whichever is greater
+def bottomOut(number):
+
+    # if the number is greater than 0
+    if number > 0:
+
+        # just return the number
+        return number
+
+    # if the number is not greater than 0
+    else:
+
+        # return 0 instead
+        return 0
+
+# --------------------------------------------------------------------------- #
 
 # return all peptides with the number of residues given by the 'residues'
 # argument that begin with the amino acid given by the 'amino_acid' argument
