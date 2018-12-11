@@ -48,7 +48,8 @@ parser.add_argument('-a', '--amino_acid', default='M',
 # length of the peptide(s) to return
 parser.add_argument('-r', '--residues', type=int, default=1,
         help='An integer signifying the desired peptide length. \
-                Defaults to 1. Can be negative.')
+                Defaults to 1. Can be negative, which will start \
+                reading before the given amino acid.')
 
 # assign the variable 'args' to the result of calling the 'parse_args'
 # method of the 'parser' object
@@ -133,7 +134,6 @@ def formatSeqName(string):
 
 # --------------------------------------------------------------------------- #
 
-# TODO implement a way to return peptides starting before the given amino acid
 # define a function to search a string representing a sequence of amino acids
 # for a given amino acid
 def searchSeq(seq, seqname, acid, length, sep):
@@ -154,24 +154,36 @@ def searchSeq(seq, seqname, acid, length, sep):
         # current value of place
         start = seq.find(acid, place)
 
-        # assign the variable subseq to the substring of the given seq from the
-        # current value of start to the current value of start to the given
-        # length, indexed from 0
-        subseq = seq[start:(start + length)]
+        # if the current value of start + length is greater than the current
+        # value of start
+        if (start + length) > start:
+
+            # assign the variable subseq to the substring of the given seq from the
+            # current value of start to the current value of start + the given
+            # length, indexed from 0
+            subseq = seq[start:(start + length)]
+
+        # otherwise
+        else:
+
+            # assign the variable subseq to the substring of the given seq from the
+            # current value of start + the given length to the current value of
+            # start, indexed from 0
+            subseq = seq[bottomOut(start + length) + 1:start + 1]
 
         # if the length of the current value of subseq is greater than or equal
-        # to half the given length
-        if len(subseq) >= length / 2:
+        # to half the absolute value of the given length
+        if len(subseq) >= abs(length) / 2:
 
             # print the concatenation of the given sep, the current value of
             # trunc, a newline character, and the current value of subseq
             print(sep + trunc + "\n" + subseq)
 
+            # assign the variable sep to a newline character
+            sep = "\n"
+
         # assign the variable place to the current value of start + 1
         place = start + 1
-
-        # assign the variable sep to a newline character
-        sep = "\n"
 
 # --------------------------------------------------------------------------- #
 
